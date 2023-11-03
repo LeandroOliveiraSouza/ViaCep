@@ -39,7 +39,7 @@ export function init() {
 }
 
 function handleInputNumberKeyUp(event) {
-    state.address.number = event.target.value;
+  state.address.number = event.target.value;
 }
 
 async function handleInputCepChange(event) {
@@ -54,8 +54,7 @@ async function handleInputCepChange(event) {
 
     setFormError("cep", "");
     state.inputNumber.focus();
-  } 
-  catch (e) {
+  } catch (e) {
     state.inputStreet.value = "";
     state.inputCity.value = "";
     setFormError("cep", "Informe um CEP válido");
@@ -75,9 +74,20 @@ function handleBtnClearClick(event) {
   clearForm();
 }
 
-async function handleBtnSaveClick(event) {
+function handleBtnSaveClick(event) {
   event.preventDefault();
-  listController.addCard(state.address);
+
+  const errors = addressService.getErrors(state.address);
+  const keys = Object.keys(errors);
+
+  if (keys.length > 0) {
+    for (let i = 0; i < keys.length; i++) {
+      setFormError(keys[i], errors[keys[i]]);
+    }
+  } else {
+    listController.addCard(state.address);
+    clearForm();
+  }
 }
 
 function clearForm() {
@@ -88,6 +98,8 @@ function clearForm() {
 
   setFormError("cep", "");
   setFormError("number", "");
+
+  state.address = new Address();
 
   state.inputCep.focus();
 }
